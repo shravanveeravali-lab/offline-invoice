@@ -1,0 +1,17 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "AGPL",
+    "FastAPI",
+    "GGUF",
+    "Gitleaks",
+    "Ollama",
+    "Pratham",
+    "Shravan",
+    "Tesseract",
+    "TinyLlama",
+    "pytesseract",
+    "uvicorn"
+  ]
+}

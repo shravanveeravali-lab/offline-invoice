@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+backend/data/
+backend/.env
+node_modules/
+frontend/dist/
+frontend/coverage/
+*.tsbuildinfo
+.env
+.DS_Store
+Thumbs.db

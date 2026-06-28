@@ -1,0 +1,144 @@
+stages:
+  - validate
+  - backend
+  - frontend
+  - security
+  - build
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
+
+python-format:
+  stage: validate
+  image: python:3.11
+  before_script:
+    - pip install black isort
+  script:
+    - black --check backend
+    - isort --check-only backend
+
+python-lint:
+  stage: validate
+  image: python:3.11
+  before_script:
+    - pip install ruff
+  script:
+    - cd backend
+    - ruff check .
+
+yaml-validation:
+  stage: validate
+  image: python:3.11
+  before_script:
+    - pip install pre-commit
+  script:
+    - pre-commit run check-yaml --all-files
+
+markdown-lint:
+  stage: validate
+  image: node:20
+  before_script:
+    - npm install -g markdownlint-cli
+  script:
+    - markdownlint "**/*.md"
+
+spell-check:
+  stage: validate
+  image: node:20
+  before_script:
+    - npm install -g cspell
+  script:
+    - cspell "**/*.{md,ts,tsx,py,yml,yaml,json}"
+
+backend-unit-tests:
+  stage: backend
+  image: python:3.11
+  before_script:
+    - cd backend
+    - pip install -r requirements-dev.txt
+  script:
+    - pytest
+
+backend-coverage:
+  stage: backend
+  image: python:3.11
+  before_script:
+    - cd backend
+    - pip install -r requirements-dev.txt
+  script:
+    - pytest --cov=app --cov-report=xml
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: backend/coverage.xml
+
+frontend-lint:
+  stage: frontend
+  image: node:20
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npm run lint
+
+frontend-type-check:
+  stage: frontend
+  image: node:20
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npx tsc -b
+
+frontend-unit-tests:
+  stage: frontend
+  image: node:20
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npm test
+
+frontend-build:
+  stage: build
+  image: node:20
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npm run build
+
+bandit:
+  stage: security
+  image: python:3.11
+  before_script:
+    - pip install bandit
+  script:
+    - bandit -r backend/app
+
+pip-audit:
+  stage: security
+  image: python:3.11
+  before_script:
+    - cd backend
+    - pip install pip-audit
+  script:
+    - pip-audit -r requirements.txt
+
+secret-scan:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
+  script:
+    - gitleaks detect --source . --no-git --redact
+
+license-check:
+  stage: security
+  image: python:3.11
+  before_script:
+    - pip install licensecheck
+  script:
+    - licensecheck --zero

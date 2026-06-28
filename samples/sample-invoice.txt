@@ -1,0 +1,11 @@
+ABC Electronics
+Invoice No: INV-1024
+Date: 2026-06-27
+Currency: INR
+
+Keyboard 2 1200 2400
+Mouse 1 600 600
+
+Subtotal: 3000
+GST: 540
+Total: 3540
